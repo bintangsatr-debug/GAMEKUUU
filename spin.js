@@ -66,7 +66,7 @@ A.spin = function () {
   const ok = spCan();
   ui(`<h2>RODA SPIN • ● ${S.coins}</h2>
 <canvas id=sw width=400 height=400></canvas>
-<p id=sr>${ok ? 'Putar roda dan menangkan koin!' : Tiket habis! Kalahin BOSS buat dapat tiket.'}</p>
+<p id=sr>${ok ? 'Putar roda dan menangkan koin!' : 'Spin habis! Kalahkan musuh untuk dapat tiket.'}</p>
 <p id=si>${spInfo()}</p>
 <div class=row><button class=g id=sb data-a=dospin ${ok ? '' : 'disabled'}>${spLabel()}</button><button data-a=menu id=sm>Kembali</button></div>`);
   spDraw(document.getElementById('sw'), SP.rot);
@@ -77,7 +77,7 @@ A.dospin = function () {
   SP.busy = true;
   const cv = document.getElementById('sw'), sb = document.getElementById('sb'), sm = document.getElementById('sm'),
         sr = document.getElementById('sr'), si = document.getElementById('si');
-  sb.disabled = true; sm.disabled = true; sr.textContent = 'OTW wkwkwk...';
+  sb.disabled = true; sm.disabled = true; sr.textContent = 'Berputar...';
 
   const idx = spPick(), amt = SP.prizes[idx], seg = 360 / SP.prizes.length;
   // bayar spin & simpan hadiah di awal (anti-curang lewat refresh)
@@ -101,7 +101,7 @@ A.dospin = function () {
     if (u < 1) { requestAnimationFrame(step); return; }
     SP.busy = false; SP.rot = to % 360;
     sfx(900, .25); setTimeout(() => sfx(1200, .3), 120);
-    sr.textContent = `Nih dapet ${amt} koin! ●`;
+    sr.textContent = `Kamu dapat ${amt} koin! ●`;
     const h = document.querySelector('#ui h2'); if (h) h.textContent = `RODA SPIN • ● ${S.coins}`;
     sm.disabled = false;
     sb.textContent = spLabel(); sb.disabled = !spCan();
