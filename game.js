@@ -100,7 +100,7 @@ function update(dt){
     if(ov(P,e)){
       const stomp=(P.vy-e.vy)>0&&(P.pb<=e.pt+12||P.y+P.h-e.y<(e.big?36:18));
       if(stomp){
-        if(e.big){if(e.inv<=0){e.hp--;e.inv=1;sfx(300,.2);if(e.hp<=0){e.dead=1;e.dt=.8;addScore(1000)}}}
+        if(e.big){if(e.inv<=0){e.hp--;e.inv=1;sfx(300,.2);if(e.hp<=0){e.dead=1;e.dt=.8;addScore(1000);S.tix=(S.tix||0)+10}}}
         else{e.dead=1;e.dt=.4;addScore(100)}
         P.vy=K.j?-560:-400;P.jp=0;sfx(700,.1);
         if(e.big){P.y=e.y-P.h-1;P.on=false;P.inv=Math.max(P.inv,.5)}
@@ -173,7 +173,7 @@ function drawP(){
 }
 function hud(){
   X.fillStyle='rgba(0,0,0,.55)';X.fillRect(0,0,W,28);X.font='bold 15px monospace';X.textAlign='left';X.fillStyle='#fff';
-  X.fillText('SKOR '+S.score,8,19);X.fillStyle='#ffd93b';X.fillText('● '+S.coins,160,19);X.fillStyle='#ff4d6d';X.fillText('♥'.repeat(Math.max(0,lives)),250,19);
+  X.fillText('SKOR '+S.score,8,19);X.fillStyle='#ffd93b';X.fillText('● '+S.coins,160,19);X.fillStyle='#ff4d6d';X.fillText('♥'.repeat(Math.max(0,lives)),250,19);X.fillStyle='#7ad7ff';X.fillText('🎟 '+(S.tix||0),340,19);
   X.fillStyle='#fff';X.textAlign='right';X.fillText(`LV${lv+1} ${L[lv].n}`,W-62,19);
   if(boss&&!boss.dead&&boss.x-cam<W+100){X.textAlign='center';X.fillStyle='#000';X.fillRect(W/2-102,38,204,22);X.fillStyle='#ffd93b';X.fillText(boss.pi?'BOS π (PI)':'THE GREAT EQUATION',W/2,34);X.fillStyle='#d62839';X.fillRect(W/2-100,44,66*boss.hp,14)}
   if(st=='play'&&t<2.8){
