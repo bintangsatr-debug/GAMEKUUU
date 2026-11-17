@@ -51,7 +51,7 @@ A.buy = function (id) {
   if (S.chCoin) { S.coins = CH.coins; save(); A.shop(); }
 };
 
-const onoff = k => S[k] ? 'ON' : 'OFF', cls = k => S[k] ? 'g' : 'r';
+const chOnOff = k => S[k] ? 'ON' : 'OFF', chCls = k => S[k] ? 'g' : 'r';
 
 A.cheat = function () {
   if (!CH.ok) {
@@ -63,11 +63,11 @@ A.cheat = function () {
   const m = CH.msg; CH.msg = '';
   ui(`<h2>🦠 CHEAT</h2>
 <div class="row ch">
-<button class=${cls('chCoin')} data-a=chcoin>Koin Tak Terbatas: ${onoff('chCoin')}</button>
-<button class=${cls('chInv')} data-a=chtog data-n=chInv>Kebal Musuh: ${onoff('chInv')}</button>
-<button class=${cls('chSpd')} data-a=chtog data-n=chSpd>Jalan Cepat: ${onoff('chSpd')}</button>
-<button class=${cls('chNoEn')} data-a=chtog data-n=chNoEn>Hilangkan Musuh: ${onoff('chNoEn')}</button>
-<button class=${cls('chNoBoss')} data-a=chtog data-n=chNoBoss>Hilangkan Boss: ${onoff('chNoBoss')}</button>
+<button class=${chCls('chCoin')} data-a=chcoin>Koin Tak Terbatas: ${chOnOff('chCoin')}</button>
+<button class=${chCls('chInv')} data-a=chtog data-n=chInv>Kebal Musuh: ${chOnOff('chInv')}</button>
+<button class=${chCls('chSpd')} data-a=chtog data-n=chSpd>Jalan Cepat: ${chOnOff('chSpd')}</button>
+<button class=${chCls('chNoEn')} data-a=chtog data-n=chNoEn>Hilangkan Musuh: ${chOnOff('chNoEn')}</button>
+<button class=${chCls('chNoBoss')} data-a=chtog data-n=chNoBoss>Hilangkan Boss: ${chOnOff('chNoBoss')}</button>
 <button class=o data-a=chlv>Buka Semua Level</button>
 <button class=o data-a=chshop>Buka Semua Item Shop</button>
 </div>
