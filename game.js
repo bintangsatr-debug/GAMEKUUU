@@ -636,7 +636,7 @@ const stats=()=>`<p>Best ${S.best} • Total ${S.total} • Koin ${S.coins}</p>`
 function menu(){st='menu';save();lv=Math.max(0,Math.min(9,S.last-1));bgmSync();
   ui(`<div class="lb ttl"><h1>AWAS PELAJARAN MAT!</h1>${stats()}</div>
 <div class="lb top"><span class=coin>● ${S.coins}</span><button class=ic data-a=set aria-label=Settings>⚙</button></div>
-<div class="lb side"><button data-a=levels>Pilih Level</button><button class=o data-a=shop>Shop</button><button class=g data-a=how>Cara Main</button></div>
+<div class="lb side"><button data-a=levels>Pilih Level</button><button class=o data-a=shop>Shop</button><button class=y data-a=spin>Spin</button>Shop</button><button class=g data-a=how>Cara Main</button></div>
 <div class="lb pl"><div class=lvn><small>LEVEL ${lv+1}</small><br>${L[lv].n}</div><button class="g play" data-a=play>Play</button></div>`,1)}
 function pause(){if(st=='play'){st='pause';save();bgmSync();ui(`<h2>PAUSE</h2><p>♪ ${BGM['lv'+lv].name}</p><div class=row><button class=g data-a=resume>Lanjut</button><button data-a=retry>Ulang Level</button><button class=r data-a=menu>Menu</button></div>`)}else if(st=='pause'){st='play';bgmSync();ui('')}}
 function shopCard(it){
