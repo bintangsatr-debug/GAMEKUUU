@@ -4,7 +4,7 @@
 const C=document.getElementById('c'),X=C.getContext('2d'),U=document.getElementById('ui'),PB=document.getElementById('pb'),TC=document.getElementById('tc');
 const W=800,H=450,T=32;C.width=W;C.height=H;X.imageSmoothingEnabled=false;
 const KEY='apm_save_v1';
-const D={best:0,total:0,coins:0,score:0,done:[],owned:['pensil'],skin:'pensil',acc:[],last:1,snd:true,touch:('ontouchstart' in window)||matchMedia('(pointer:coarse)').matches};
+const D={best:0,total:0,coins:0,score:0,done:[],owned:['pensil'],skin:'pensil',acc:[],last:1,tix:0,spinDay:'',spinUsed:0,snd:true,touch:('ontouchstart' in window)||matchMedia('(pointer:coarse)').matches};
 let S;try{S=Object.assign({},D,JSON.parse(localStorage.getItem(KEY)))}catch(e){S={...D}}
 S.done=[...(S.done||[])];
 S.owned=Array.isArray(S.owned)?[...S.owned]:['pensil'];
