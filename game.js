@@ -419,7 +419,6 @@ function menu(){st='menu';save();lv=Math.max(0,Math.min(9,S.last-1));bgmSync();
 <div class="lb side"><button data-a=levels>Pilih Level</button><button class=o data-a=shop>Shop</button><button class=y data-a=spin>Spin</button><button class=g data-a=how>Cara Main</button></div>
 <div class="lb pl"><div class=lvn><small>LEVEL ${lv+1}</small><br>${L[lv].n}</div><button class="g play" data-a=play>Play</button></div>`,1)}
 function pause(){if(st=='play'){st='pause';save();bgmSync();ui(`<h2>PAUSE</h2><p>♪ ${BGM['lv'+lv].name}</p><div class=row><button class=g data-a=resume>Lanjut</button><button data-a=retry>Ulang Level</button><button class=r data-a=menu>Menu</button></div>`)}else if(st=='pause'){st='play';bgmSync();ui('')}}
-}
 const A={
   play(){const i=Math.max(0,Math.min(9,S.last-1));trans(()=>start(i))},
   newg(){if(confirm('Ulang dari Level 1? Progress level dan skor dihapus. Koin, karakter, dan aksesoris tetap aman.')){S.done=[];S.last=1;S.score=0;save();A.set()}},
