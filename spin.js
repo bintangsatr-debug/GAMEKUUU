@@ -33,7 +33,7 @@ const SP = {
 #swrap{position:relative;width:29cqw;height:29cqw;filter:drop-shadow(0 0 1.6cqw rgba(255,217,59,.55));
   animation:spglow 2.6s ease-in-out infinite}
 #swrap.win{animation:spflash 1.1s ease-out}
-#sw{width:100%;height:100%;display:block}
+#sw{width:100%;height:100%;display:block;background:transparent!important;background-color:transparent!important;border:none!important;box-shadow:none!important;outline:none!important;image-rendering:auto}
 
 /* teks hasil & info */
 #sr{margin:0;min-height:2.8cqw;font-size:2.3cqw;font-weight:bold;color:#ffd93b;
@@ -218,6 +218,7 @@ A.spin = function () {
 <div class=row><button class=g id=sb data-a=dospin ${ok ? '' : 'disabled'}>${spLabel()}</button><button data-a=menu id=sm>Kembali</button></div>
 </div>`);
   const cv = document.getElementById('sw');
+  cv.style.setProperty('background', 'transparent', 'important');
   spDraw(cv, SP.rot, 0, false);
   // lampu bingkai berkedip saat roda diam
   let last = 0;
