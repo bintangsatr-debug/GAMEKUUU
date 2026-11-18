@@ -6,12 +6,18 @@
    3) prev()        : ikon preview item di kartu toko
    4) shopCard()    : tampilan kartu item di toko
    5) SHOP.shop()   : halaman toko (kiri = daftar item per tab,
-                      kanan = preview karakter yang sedang dipakai)
-   6) SHOP.buy()    : logika beli / pakai / lepas / pindah tab
+                      kanan = preview item yang dipilih + tombol aksi)
+   6) SHOP.buy()    : logika tab / preview / beli / pakai / lepas
    Tab/kategori: Karakter, Aksesoris, Senjata (daftar di CATS)
 
+   ALUR TOKO:
+   - Tap kartu item  -> hanya PREVIEW (data-n="sel:ID"), tidak membeli.
+   - Item belum dibeli tampil dengan GEMBOK (di kartu & di preview).
+   - Tombol di panel kanan: Beli / Pakai / Lepas (data-n="ID").
+   - Setelah membeli, gembok memainkan animasi TERBUKA lalu hilang.
+
    Dimuat SEBELUM game.js. Memakai dari game.js (dipanggil saat
-   runtime): S, ui, save, sfx, st, A
+   runtime): S, ui, save, sfx, st, A, C, W
    Dipakai game.js: chr, IT, eq, SHOP
    Dipakai cutscene.js: chr
 
@@ -263,12 +269,15 @@ function prev(id){try{const cv=document.createElement('canvas');cv.width=44;cv.h
 // Kategori tab (urutan tab dari kiri ke kanan)
 const CATS=['Karakter','Aksesoris','Senjata'];
 
-// Gambar karakter yang sedang dipakai (lengkap dengan aksesoris) untuk panel kanan
-function charImg(){try{
+// Gambar karakter (skin + daftar aksesoris) untuk panel kanan
+function charImg(skin,acc){try{
   const cv=document.createElement('canvas');cv.width=52;cv.height=64;
   const c=cv.getContext('2d');c.translate(30,32);
-  chr(c,S.skin,S.acc,0);
+  chr(c,skin||S.skin,acc||S.acc,0);
   return cv.toDataURL()}catch(e){return''}}
+
+// Gembok pixel (SVG). Bagian .sh-shk (lengkungan) dianimasikan saat terbuka.
+const LOCK='<svg viewBox="0 0 16 19"><g class=sh-shk><path d="M4.5 10V3.5H11.5V10" fill="none" stroke="#1b1b1b" stroke-width="4"/><path d="M4.5 10V3.5H11.5V10" fill="none" stroke="#cfd8dc" stroke-width="2"/></g><rect x="1.5" y="9" width="13" height="9.5" fill="#1b1b1b"/><rect x="2.5" y="10" width="11" height="7.5" fill="#ffd93b"/><rect x="2.5" y="15.5" width="11" height="2" fill="#f0a800"/><rect x="7" y="12" width="2" height="3" fill="#1b1b1b"/></svg>';
 
 // Skala toko mengikuti ukuran canvas game (800 x 450).
 // Semua ukuran di CSS di bawah ditulis dalam "unit game": z(14) = 14 unit.
@@ -291,56 +300,124 @@ function shopStyle(){
 #ui .sh-tabs{display:flex;gap:${z(4)};flex:none}
 #ui .sh-tab{flex:1;min-width:0;margin:0;padding:0;height:${z(30)};min-height:0;width:auto;font-size:${z(15)};line-height:1;letter-spacing:0;opacity:.6}
 #ui .sh-tab.on{opacity:1;outline:${z(2)} solid #ffd93b}
-#ui .sh-list{flex:1;min-height:0;display:flex;flex-direction:column;gap:${z(6)};overflow-y:auto;padding-right:${z(4)}}
+#ui .sh-list{flex:1;min-height:0;display:flex;flex-direction:column;gap:${z(6)};overflow-y:auto;padding:${z(3)} ${z(4)} ${z(3)} ${z(3)}}
 #ui .sh-it{flex:none;display:flex;align-items:center;gap:${z(8)};margin:0;padding:${z(4)} ${z(8)};width:100%;height:${z(52)};min-height:0;box-sizing:border-box;text-align:left;letter-spacing:0;overflow:hidden}
-#ui .sh-it img{width:${z(40)};height:${z(40)};image-rendering:pixelated;flex:none}
+#ui .sh-ic{position:relative;flex:none;width:${z(40)};height:${z(40)}}
+#ui .sh-ic img{width:100%;height:100%;image-rendering:pixelated;display:block}
+#ui .sh-it.lkd .sh-ic img{filter:brightness(.55)}
 #ui .sh-it .sh-n{flex:1;min-width:0;font-size:${z(16)};font-weight:bold;line-height:1.1}
 #ui .sh-it .sh-s{flex:none;font-size:${z(13)};white-space:nowrap}
-#ui .sh-it.on{outline:${z(2)} solid #2ecc40}
+#ui .sh-it.on{box-shadow:inset 0 0 0 ${z(2)} #2ecc40}
+#ui .sh-it.sel{outline:${z(2)} solid #ffd93b}
 #ui .sh-empty{padding:${z(40)} ${z(10)};text-align:center;opacity:.7;font-size:${z(15)}}
 #ui .sh-right{width:${z(190)};flex:none;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${z(4)};background:rgba(0,0,0,.35);border-radius:${z(10)};padding:${z(8)};text-align:center}
-#ui .sh-char{width:${z(156)};height:${z(192)};image-rendering:pixelated;object-fit:contain}
+#ui .sh-stage{position:relative;flex:none;width:${z(156)};height:${z(172)}}
+#ui .sh-char{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;object-fit:contain}
+#ui .sh-char.lk{filter:brightness(.25) grayscale(1)}
+#ui .sh-char.unl{animation:shReveal 1.2s forwards}
 #ui .sh-right b{font-size:${z(16)}}
-#ui .sh-right small{font-size:${z(12)};line-height:1.4;opacity:.85}
+#ui .sh-right small{font-size:${z(12)};line-height:1.35;opacity:.85}
+#ui .sh-st{font-weight:bold;opacity:1!important}
+#ui .sh-st.lk{color:#ff8a8a}
+#ui .sh-st.ok{color:#7dff9a}
+#ui .sh-act{margin:${z(2)} 0 0;padding:0 ${z(8)};width:100%;height:${z(30)};min-height:0;font-size:${z(14)};line-height:1;letter-spacing:0}
+/* gembok */
+#ui .sh-lk{position:absolute;pointer-events:none}
+#ui .sh-lk svg{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 ${z(2)} 0 rgba(0,0,0,.45))}
+#ui .sh-lk.big{left:50%;top:50%;width:${z(64)};margin:${z(-38)} 0 0 ${z(-32)}}
+#ui .sh-lk.badge{right:${z(2)};top:${z(2)};width:${z(34)}}
+#ui .sh-lk.sm{right:${z(-3)};bottom:${z(-3)};width:${z(17)}}
+#ui .sh-lk.open svg{animation:shLk 1.2s ease-in forwards}
+#ui .sh-lk.open .sh-shk{transform-box:fill-box;transform-origin:0 100%;animation:shShk 1.2s ease-out forwards}
+#ui .sh-sp{position:absolute;left:50%;top:50%;width:${z(7)};height:${z(7)};margin:${z(-4)} 0 0 ${z(-4)};background:#ffd93b;box-shadow:0 0 0 ${z(1)} #1b1b1b;opacity:0;pointer-events:none;animation:shSp .8s .55s ease-out forwards}
+@keyframes shLk{
+ 0%{transform:none;opacity:1}
+ 8%{transform:rotate(-9deg)}16%{transform:rotate(9deg)}24%{transform:rotate(-6deg)}32%{transform:rotate(0)}
+ 70%{transform:scale(1.12);opacity:1}
+ 100%{transform:translateY(40%) scale(.7);opacity:0}}
+@keyframes shShk{
+ 0%,30%{transform:none}
+ 50%{transform:translateY(-3px)}
+ 70%,100%{transform:translateY(-3px) rotate(-38deg)}}
+@keyframes shReveal{
+ 0%,45%{filter:brightness(.25) grayscale(1)}
+ 100%{filter:none}}
+@keyframes shSp{
+ 0%{opacity:1;transform:translate(0,0) scale(1)}
+ 100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.3)}}
 `;
   document.head.appendChild(s);
   addEventListener('resize',()=>{const r=document.querySelector('.sh-root');if(r)r.style.setProperty('--u',shopU()+'px')});
 }
 
-// Kartu item di daftar kiri
-function shopCard(it){
-  const own=S.owned.includes(it.id),on=eq(it);
-  const lbl=on?(it.cat=='Karakter'?'✓ Dipakai':'✓ Dipakai (Lepas)'):own?'Pakai':'● '+it.p;
-  return`<button class="sh-it${on?' on':''}" data-a=buy data-n="${it.id}" ${own||S.coins>=it.p?'':'disabled'}><img src="${prev(it.id)}"><span class="sh-n">${it.n}</span><span class="sh-s">${lbl}</span></button>`;
+// Kartu item di daftar kiri (tap = preview, bukan beli)
+function shopCard(it,sel){
+  const own=S.owned.includes(it.id),on=eq(it),isSel=!!sel&&sel.id==it.id;
+  const lbl=on?'✓ Dipakai':own?'Dimiliki':'● '+it.p;
+  return`<button class="sh-it${on?' on':''}${isSel?' sel':''}${own?'':' lkd'}" data-a=buy data-n="sel:${it.id}"><span class=sh-ic><img src="${prev(it.id)}">${own?'':`<span class="sh-lk sm">${LOCK}</span>`}</span><span class="sh-n">${it.n}</span><span class="sh-s">${lbl}</span></button>`;
 }
 
 // Dipasang ke objek A di game.js (A.shop dan A.buy)
 const SHOP={
   cur:'Karakter', // tab yang sedang dibuka
-  shop(){
+  sel:null,       // id item yang sedang di-preview
+  unl:null,       // {id,t} animasi gembok terbuka yang sedang berjalan
+  shop(reset){
     st='menu';shopStyle();
     const tab=SHOP.cur;
+    let sel=IT.find(x=>x.id==SHOP.sel)||null;if(sel&&sel.cat!=tab)sel=null;
+    const old=document.querySelector('#ui .sh-list'),sc=(!reset&&old)?old.scrollTop:0;
     const items=IT.filter(x=>x.cat==tab);
     const tabs=CATS.map(c=>`<button class="sh-tab${c==tab?' on':''}" data-a=buy data-n="tab:${c}">${c}</button>`).join('');
-    const list=items.length?items.map(shopCard).join(''):'<div class=sh-empty>Belum ada item.<br>Segera hadir!</div>';
-    const me=IT.find(x=>x.id==S.skin),wp=IT.find(x=>x.id==S.weapon);
-    const accOn=IT.filter(x=>x.cat=='Aksesoris'&&S.acc.includes(x.id)).map(x=>x.n);
+    const list=items.length?items.map(it=>shopCard(it,sel)).join(''):'<div class=sh-empty>Belum ada item.<br>Segera hadir!</div>';
+
+    // --- panel kanan: preview item terpilih ---
+    const own=sel?S.owned.includes(sel.id):true,locked=!!sel&&!own;
+    const anim=!!sel&&!!SHOP.unl&&SHOP.unl.id==sel.id&&performance.now()-SHOP.unl.t<1500;
+    const isChar=!!sel&&sel.cat=='Karakter';
+    const skin=isChar?sel.id:S.skin;
+    const acc=(sel&&sel.cat=='Aksesoris'&&!S.acc.includes(sel.id))?[...S.acc,sel.id]:S.acc;
+    const shown=sel||IT.find(x=>x.id==S.skin);
+    const wp=IT.find(x=>x.id==S.weapon);
+    const accOn=IT.filter(x=>x.cat=='Aksesoris'&&acc.includes(x.id)).map(x=>x.n);
+    const imgCls=locked&&isChar?'lk':anim&&isChar?'unl':'';
+    const lockEl=(locked||anim)?`<span class="sh-lk ${isChar?'big':'badge'}${anim?' open':''}">${LOCK}</span>`:'';
+    const spk=anim?[[-1,-1],[0,-1.3],[1,-1],[1.3,0],[1,1],[0,1.3],[-1,1],[-1.3,0]].map(([x,y])=>`<i class=sh-sp style="--dx:calc(var(--u,.5px)*${Math.round(x*48)});--dy:calc(var(--u,.5px)*${Math.round(y*48)})"></i>`).join(''):'';
+    let stat='',act='';
+    if(sel){
+      const on=eq(sel);
+      if(locked){
+        stat='<small class="sh-st lk">🔒 Terkunci</small>';
+        act=`<button class="g sh-act" data-a=buy data-n="${sel.id}" ${S.coins>=sel.p?'':'disabled'}>${S.coins>=sel.p?'Beli ● '+sel.p:'Koin kurang (● '+sel.p+')'}</button>`;
+      }else{
+        stat=`<small class="sh-st ok">${anim?'🔓 Terbuka!':on?'✓ Sedang dipakai':'Dimiliki'}</small>`;
+        if(sel.cat=='Karakter')act=`<button class="sh-act" data-a=buy data-n="${sel.id}" ${on?'disabled':''}>${on?'✓ Dipakai':'Pakai'}</button>`;
+        else act=`<button class="${on?'r':'g'} sh-act" data-a=buy data-n="${sel.id}">${on?'Lepas':'Pakai'}</button>`;
+      }
+    }
     ui(`<div class=sh-root style="--u:${shopU()}px">
 <div class=sh-top><h2>TOKO</h2><span class=sh-coin>● ${S.coins}</span><button data-a=menu>Kembali</button></div>
 <div class=sh-wrap>
 <div class=sh-left><div class=sh-tabs>${tabs}</div><div class=sh-list>${list}</div></div>
-<div class=sh-right><img class=sh-char src="${charImg()}"><b>${me?me.n:''}</b>
-<small>Aksesoris: ${accOn.length?accOn.join(', '):'-'}<br>Senjata: ${wp?wp.n:'-'}</small></div>
+<div class=sh-right><div class=sh-stage><img class="sh-char ${imgCls}" src="${charImg(skin,acc)}">${lockEl}${spk}</div><b>${shown?shown.n:''}</b>${stat}
+<small>Aksesoris: ${accOn.length?accOn.join(', '):'-'}<br>Senjata: ${wp?wp.n:'-'}</small>${act}</div>
 </div></div>`);
+    const nl=document.querySelector('#ui .sh-list');if(nl&&sc)nl.scrollTop=sc;
   },
   buy(id){
-    // pindah tab (dipakai tombol tab lewat data-n="tab:NamaKategori")
-    if(String(id).startsWith('tab:')){SHOP.cur=id.slice(4);sfx(600,.06);SHOP.shop();return}
+    id=String(id);
+    // pindah tab (data-n="tab:NamaKategori")
+    if(id.startsWith('tab:')){SHOP.cur=id.slice(4);SHOP.sel=null;SHOP.unl=null;sfx(600,.06);SHOP.shop(1);return}
+    // preview item (data-n="sel:ID") — TIDAK membeli
+    if(id.startsWith('sel:')){SHOP.sel=id.slice(4);SHOP.unl=null;sfx(600,.06);SHOP.shop();return}
+    // beli / pakai / lepas (data-n="ID") — dari tombol di panel kanan
     const it=IT.find(x=>x.id==id);if(!it)return;
     const had=S.owned.includes(id);
     if(!had){
       if(S.coins<it.p){sfx(150,.2,'sawtooth');return}
       S.coins-=it.p;S.owned.push(id);sfx(900,.2);
+      setTimeout(()=>sfx(1250,.18),420);            // bunyi "klik" gembok terbuka
+      SHOP.unl={id,t:performance.now()};            // mulai animasi gembok terbuka
     }else sfx(600,.08);
     if(it.cat=='Karakter')S.skin=id;
     else if(it.cat=='Senjata')S.weapon=(had&&S.weapon==id)?'':id;
@@ -349,6 +426,7 @@ const SHOP={
       if(idx>=0&&had)S.acc.splice(idx,1);
       else if(idx<0)S.acc.push(id);
     }
+    SHOP.sel=id;
     save();SHOP.shop();
   }
 };
