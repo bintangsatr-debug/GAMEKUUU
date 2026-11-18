@@ -1,11 +1,11 @@
 'use strict';
 
-// ===== RODA SPIN KOIN + TIKET (versi tampilan baru) =====
+// ===== RODA SPIN KOIN + TIKET (versi RETRO 8-bit) =====
 // Dimuat SETELAH game.js (memakai S, A, ui, save, sfx dari game.js)
 const SP = {
   prizes: [10, 50, 100, 200, 300, 1000],
   weights: [35, 25, 20, 12, 6, 2],   // peluang (%) tiap hadiah
-  cols: ['#ff9f1c', '#3a86ff', '#2a9d4a', '#8e44ad', '#e63946', '#ffd93b'],
+  cols: ['#ef7d57', '#3b5dc9', '#38b764', '#a24bb0', '#b13e53', '#ffcd75'], // palet 16-warna
   freePerDay: 5,                     // spin gratis per hari
   tixCost: 10,                       // tiket yang dibutuhkan untuk 1 spin ekstra
   rot: 0,
@@ -17,81 +17,89 @@ const SP = {
   const st = document.createElement('style');
   st.id = 'spcss';
   st.textContent = `
-/* --- hilangkan kotak hitam: panel #ui jadi transparan saat layar spin tampil --- */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* panel #ui transparan, kotak retro dibuat oleh #spw sendiri */
 #ui:has(#spw){background:none!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important;outline:none!important}
 
-#spw{position:relative;display:flex;flex-direction:column;align-items:center;gap:1.1cqw;
-  background:radial-gradient(ellipse at 50% 45%,rgba(142,68,173,.55) 0%,rgba(58,134,255,.18) 45%,rgba(0,0,0,0) 72%)}
+#spw{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:1.3cqw;
+  padding:2cqw 4cqw 2.4cqw;
+  font-family:'Press Start 2P',ui-monospace,Menlo,Consolas,monospace;image-rendering:pixelated;
+  background:
+    repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 .4cqw,transparent .4cqw .8cqw),
+    radial-gradient(ellipse at 50% 45%,#29366f 0%,#1a1c2c 78%);
+  /* bingkai piksel berlapis: hitam - emas - hitam */
+  box-shadow:0 0 0 .6cqw #000,0 0 0 1.2cqw #ffcd75,0 0 0 1.8cqw #000,0 1.2cqw 0 1.8cqw #000}
 #spw>*:not(#spfx){position:relative;z-index:1}
+/* garis scanline layar CRT */
+#spw::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 .15cqw,transparent .15cqw .45cqw)}
 
 /* judul */
-#spw h2{margin:0;font-size:3.2cqw;letter-spacing:.2cqw;color:#ffd93b;
-  text-shadow:0 .35cqw 0 #8a4b00,0 0 1.8cqw #ff9f1c,0 0 .4cqw #000;transition:transform .2s}
-#spw h2.pop{animation:sppop .45s ease}
+#spw h2{margin:0;font:inherit;font-size:2.4cqw;line-height:1.4;color:#ffcd75;letter-spacing:.1cqw;
+  text-shadow:.3cqw .3cqw 0 #b13e53,.6cqw .6cqw 0 #000}
+#spw h2.pop{animation:sppop .4s steps(4)}
 
 /* roda */
-#swrap{position:relative;width:29cqw;height:29cqw;filter:drop-shadow(0 0 1.6cqw rgba(255,217,59,.55));
-  animation:spglow 2.6s ease-in-out infinite}
-#swrap.win{animation:spflash 1.1s ease-out}
-#sw{width:100%;height:100%;display:block;background:transparent!important;background-color:transparent!important;border:none!important;box-shadow:none!important;outline:none!important;image-rendering:auto}
+#swrap{position:relative;width:29cqw;height:29cqw}
+#swrap.win{animation:spflash .8s steps(6)}
+#sw{width:100%;height:100%;display:block;background:transparent!important;background-color:transparent!important;
+  border:none!important;box-shadow:none!important;outline:none!important;
+  image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
 
 /* teks hasil & info */
-#sr{margin:0;min-height:2.8cqw;font-size:2.3cqw;font-weight:bold;color:#ffd93b;
-  text-shadow:.2cqw .2cqw 0 #000,-.2cqw .2cqw 0 #000,.2cqw -.2cqw 0 #000,-.2cqw -.2cqw 0 #000}
-#sr.pop{animation:sppop .5s ease}
-#si{margin:0;font-size:1.6cqw;color:#c9f0ff;padding:.5cqw 1.8cqw;border-radius:5cqw;
-  background:linear-gradient(90deg,rgba(58,134,255,.35),rgba(142,68,173,.35));
-  border:.2cqw solid rgba(255,255,255,.35)}
+#sr{margin:0;min-height:2.6cqw;font-size:1.7cqw;line-height:1.5;text-align:center;color:#a7f070;
+  text-transform:uppercase;text-shadow:.25cqw .25cqw 0 #000}
+#sr.pop{animation:sppop .5s steps(5);color:#ffcd75}
+#si{margin:0;max-width:62cqw;text-align:center;font-size:.95cqw;line-height:1.8;color:#73eff7;
+  text-transform:uppercase;padding:.8cqw 1.6cqw;background:#333c57;
+  box-shadow:0 -.3cqw 0 0 #000,0 .3cqw 0 0 #000,-.3cqw 0 0 0 #000,.3cqw 0 0 0 #000,
+    inset -.3cqw -.3cqw 0 0 #1a1c2c,inset .3cqw .3cqw 0 0 #566c86}
 
-/* tombol */
-#spw .row{display:flex;gap:1.6cqw;justify-content:center;margin-top:.4cqw}
-#spw button{position:relative;overflow:hidden;font:inherit;font-weight:bold;font-size:2.2cqw;color:#fff;
-  padding:1.1cqw 3.4cqw;border-radius:5cqw;border:.4cqw solid #000;cursor:pointer;
-  text-shadow:0 .2cqw 0 rgba(0,0,0,.55);box-shadow:0 .7cqw 0 #000,0 1.2cqw 1.6cqw rgba(0,0,0,.4);
-  transition:transform .12s,box-shadow .12s,filter .2s}
-#spw button::before{content:'';position:absolute;left:8%;right:8%;top:6%;height:42%;border-radius:5cqw;
-  background:linear-gradient(rgba(255,255,255,.55),rgba(255,255,255,0))}
-#spw button::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:30%;
-  background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);
-  transform:skewX(-20deg);animation:spshine 3s ease-in-out infinite}
-#spw button#sb{background:linear-gradient(#5be37d,#1f9d45);font-size:2.6cqw;padding:1.2cqw 4.4cqw;
-  animation:spbeat 1.4s ease-in-out infinite}
-#spw button#sm{background:linear-gradient(#9b6bff,#5b34c9)}
-#spw button#sm::after{animation-delay:1.2s}
-#spw button:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-.2cqw)}
-#spw button:active:not(:disabled){transform:translateY(.6cqw);box-shadow:0 .1cqw 0 #000}
-#spw button:disabled{filter:grayscale(.85) brightness(.7);cursor:not-allowed;animation:none}
-#spw button:disabled::after{display:none}
+/* tombol piksel */
+#spw .row{display:flex;gap:2cqw;justify-content:center;margin-top:.8cqw}
+#spw button{position:relative;font:inherit;font-size:1.7cqw;color:#fff;text-transform:uppercase;
+  padding:1.3cqw 2.8cqw;border:none;border-radius:0;cursor:pointer;
+  text-shadow:.2cqw .2cqw 0 rgba(0,0,0,.7);
+  box-shadow:inset -.5cqw -.5cqw 0 0 rgba(0,0,0,.35),inset .5cqw .5cqw 0 0 rgba(255,255,255,.45),
+    -.4cqw 0 0 0 #000,.4cqw 0 0 0 #000,0 -.4cqw 0 0 #000,0 .9cqw 0 0 #000;
+  transition:none}
+#spw button#sb{background:#38b764;font-size:2cqw;padding:1.4cqw 3.6cqw;animation:spbeat 1s steps(1) infinite}
+#spw button#sm{background:#3b5dc9}
+#spw button:hover:not(:disabled){filter:brightness(1.2)}
+#spw button:active:not(:disabled){transform:translateY(.5cqw);
+  box-shadow:inset -.5cqw -.5cqw 0 0 rgba(0,0,0,.35),inset .5cqw .5cqw 0 0 rgba(255,255,255,.45),
+    -.4cqw 0 0 0 #000,.4cqw 0 0 0 #000,0 -.4cqw 0 0 #000,0 .4cqw 0 0 #000}
+#spw button:disabled{background:#566c86;color:#94b0c2;cursor:not-allowed;animation:none;text-shadow:none}
 
-/* koin melayang & kilau */
-#spfx{position:absolute;inset:-4cqw -8cqw;z-index:0;pointer-events:none;overflow:hidden}
-.fc{position:absolute;top:105%;aspect-ratio:1;animation:spfloat linear infinite}
-.fc b{display:block;width:100%;height:100%;border-radius:50%;
-  background:radial-gradient(circle at 32% 30%,#fffbc4,#ffd93b 45%,#c98a00);
-  border:.25cqw solid #8a5a00;box-shadow:0 0 1.2cqw rgba(255,217,59,.8);
-  animation:spflip 1.7s ease-in-out infinite,spsway 3.4s ease-in-out infinite}
-.fc b::after{content:'';position:absolute;inset:22%;border-radius:50%;border:.2cqw solid rgba(138,90,0,.55)}
-.ks{position:absolute;color:#fff;font-style:normal;line-height:1;text-shadow:0 0 1cqw currentColor;
-  animation:sptwinkle ease-in-out infinite;opacity:0}
-.bc{position:absolute;left:50%;top:50%;width:3cqw;height:3cqw;border-radius:50%;z-index:3;pointer-events:none;
-  background:radial-gradient(circle at 32% 30%,#fffbc4,#ffd93b 45%,#c98a00);border:.25cqw solid #8a5a00;
-  box-shadow:0 0 1.2cqw rgba(255,217,59,.9);animation:spburst 1.3s ease-out forwards}
-.bs{position:absolute;left:50%;top:50%;z-index:3;pointer-events:none;font-style:normal;font-size:3cqw;
-  text-shadow:0 0 1cqw currentColor;animation:spburst 1.3s ease-out forwards}
+/* koin piksel melayang & kilau */
+#spfx{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.fc{position:absolute;top:105%;aspect-ratio:1;animation:spfloat linear infinite;animation-timing-function:steps(36)}
+.fc b{display:block;width:100%;height:100%;background:#ffcd75;
+  clip-path:polygon(25% 0,75% 0,75% 12%,88% 12%,88% 25%,100% 25%,100% 75%,88% 75%,88% 88%,75% 88%,75% 100%,25% 100%,25% 88%,12% 88%,12% 75%,0 75%,0 25%,12% 25%,12% 12%,25% 12%);
+  box-shadow:inset -.4cqw -.4cqw 0 0 #c98a00,inset .35cqw .35cqw 0 0 #fff4a8;
+  animation:spflip 1.2s steps(1) infinite}
+.ks{position:absolute;font-size:1cqw;width:.3em;height:.3em;background:currentColor;opacity:0;
+  box-shadow:0 -.3em 0 currentColor,0 .3em 0 currentColor,-.3em 0 0 currentColor,.3em 0 0 currentColor;
+  animation:sptwinkle steps(1) infinite}
+.bc{position:absolute;left:50%;top:50%;width:2.4cqw;height:2.4cqw;z-index:3;pointer-events:none;background:#ffcd75;
+  clip-path:polygon(25% 0,75% 0,75% 12%,88% 12%,88% 25%,100% 25%,100% 75%,88% 75%,88% 88%,75% 88%,75% 100%,25% 100%,25% 88%,12% 88%,12% 75%,0 75%,0 25%,12% 25%,12% 12%,25% 12%);
+  box-shadow:inset -.35cqw -.35cqw 0 0 #c98a00,inset .3cqw .3cqw 0 0 #fff4a8;
+  animation:spburst 1.2s steps(10) forwards}
+.bs{position:absolute;left:50%;top:50%;z-index:3;pointer-events:none;width:1cqw;height:1cqw;background:currentColor;
+  animation:spburst 1.2s steps(10) forwards}
 
 @keyframes spfloat{0%{top:105%;opacity:0}8%{opacity:1}88%{opacity:1}100%{top:-12%;opacity:0}}
-@keyframes spflip{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.18)}}
-@keyframes spsway{0%,100%{margin-left:-1.4cqw}50%{margin-left:1.4cqw}}
-@keyframes sptwinkle{0%,100%{opacity:0;transform:scale(.2) rotate(0)}50%{opacity:1;transform:scale(1) rotate(90deg)}}
-@keyframes spshine{0%,60%{left:-60%}100%{left:140%}}
-@keyframes spbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-@keyframes spglow{0%,100%{filter:drop-shadow(0 0 1.2cqw rgba(255,217,59,.45))}50%{filter:drop-shadow(0 0 2.6cqw rgba(255,217,59,.9))}}
-@keyframes spflash{0%{filter:drop-shadow(0 0 1cqw #fff) brightness(1)}20%{filter:drop-shadow(0 0 4cqw #fff) brightness(1.5)}100%{filter:drop-shadow(0 0 1.6cqw rgba(255,217,59,.55)) brightness(1)}}
-@keyframes sppop{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes spflip{0%{transform:scaleX(1)}25%{transform:scaleX(.5)}50%{transform:scaleX(.2)}75%{transform:scaleX(.5)}}
+@keyframes sptwinkle{0%{opacity:0}25%{opacity:1}60%{opacity:.5}80%{opacity:1}}
+@keyframes spbeat{0%{transform:scale(1)}50%{transform:scale(1.05)}}
+@keyframes spflash{0%,40%,80%{filter:brightness(2.2)}20%,60%,100%{filter:brightness(1)}}
+@keyframes sppop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(1)}}
 @keyframes spburst{
-  0%{transform:translate(-50%,-50%) scale(.3) rotate(0);opacity:1}
-  55%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1) rotate(180deg);opacity:1}
-  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 12cqw)) scale(.8) rotate(360deg);opacity:0}}
+  0%{transform:translate(-50%,-50%) scale(.4);opacity:1}
+  55%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1);opacity:1}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 12cqw)) scale(.8);opacity:0}}
+@media (prefers-reduced-motion:reduce){.fc,.ks,#spw button#sb{animation:none}}
 `;
   document.head.appendChild(st);
 })();
@@ -110,7 +118,7 @@ function spPick() {
   return 0;
 }
 
-// koin melayang + kilau di latar layar spin
+// koin piksel melayang + kilau di latar layar spin
 function spFx() {
   let h = '';
   for (let i = 0; i < 10; i++) {
@@ -118,11 +126,11 @@ function spFx() {
     h += `<i class=fc style="left:${(4 + Math.random() * 90).toFixed(1)}%;width:${sz.toFixed(1)}cqw;` +
          `animation-duration:${dur.toFixed(1)}s;animation-delay:-${(Math.random() * dur).toFixed(1)}s"><b style="animation-delay:-${(Math.random() * 3).toFixed(1)}s"></b></i>`;
   }
-  const cs = ['#ffffff', '#ffd93b', '#7ad7ff', '#ffb3f0'];
+  const cs = ['#f4f4f4', '#ffcd75', '#73eff7', '#ef7d57'];
   for (let i = 0; i < 16; i++) {
-    h += `<i class=ks style="left:${(Math.random() * 96).toFixed(1)}%;top:${(Math.random() * 92).toFixed(1)}%;` +
-         `font-size:${(1.4 + Math.random() * 2.2).toFixed(1)}cqw;color:${cs[i % cs.length]};` +
-         `animation-duration:${(1.6 + Math.random() * 1.8).toFixed(1)}s;animation-delay:-${(Math.random() * 3).toFixed(1)}s">✦</i>`;
+    h += `<i class=ks style="left:${(2 + Math.random() * 94).toFixed(1)}%;top:${(4 + Math.random() * 88).toFixed(1)}%;` +
+         `font-size:${(1 + Math.random() * 1.2).toFixed(1)}cqw;color:${cs[i % cs.length]};` +
+         `animation-duration:${(1.6 + Math.random() * 1.8).toFixed(1)}s;animation-delay:-${(Math.random() * 3).toFixed(1)}s"></i>`;
   }
   return h;
 }
@@ -130,80 +138,111 @@ function spFx() {
 // ledakan koin saat menang
 function spBurst(amt) {
   const w = document.getElementById('swrap'); if (!w) return;
-  const n = amt >= 200 ? 26 : 14, cs = ['#ffffff', '#ffd93b', '#7ad7ff', '#ffb3f0'];
+  const n = amt >= 200 ? 26 : 14, cs = ['#f4f4f4', '#ffcd75', '#73eff7', '#ef7d57'];
   for (let i = 0; i < n; i++) {
     const a = Math.random() * Math.PI * 2, d = 8 + Math.random() * 14;
     const el = document.createElement('i');
     el.className = i % 3 === 0 ? 'bs' : 'bc';
-    if (i % 3 === 0) { el.textContent = '✦'; el.style.color = cs[i % cs.length]; }
+    if (i % 3 === 0) el.style.color = cs[i % cs.length];
     el.style.setProperty('--dx', (Math.cos(a) * d).toFixed(1) + 'cqw');
     el.style.setProperty('--dy', (Math.sin(a) * d - 4).toFixed(1) + 'cqw');
     el.style.animationDelay = (Math.random() * .12).toFixed(2) + 's';
     w.appendChild(el);
-    setTimeout(() => el.remove(), 1600);
+    setTimeout(() => el.remove(), 1500);
   }
   w.classList.remove('win'); void w.offsetWidth; w.classList.add('win');
-  setTimeout(() => w.classList.remove('win'), 1200);
+  setTimeout(() => w.classList.remove('win'), 900);
 }
 
 function spPop(el) { if (!el) return; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
 
+// ---------- gambar roda pixel-art (dirender per piksel, 160x160) ----------
+const SPW = 160;
+const SPDIG = {
+  0: ['111', '101', '101', '101', '111'], 1: ['010', '110', '010', '010', '111'],
+  2: ['111', '001', '111', '100', '111'], 3: ['111', '001', '111', '001', '111'],
+  4: ['101', '101', '111', '001', '001'], 5: ['111', '100', '111', '001', '111'],
+  6: ['111', '100', '111', '101', '111'], 7: ['111', '001', '001', '001', '001'],
+  8: ['111', '101', '111', '101', '111'], 9: ['111', '101', '111', '001', '111']
+};
+const spHex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const spMix = (c, t, k) => [c[0] + (t[0] - c[0]) * k | 0, c[1] + (t[1] - c[1]) * k | 0, c[2] + (t[2] - c[2]) * k | 0];
+const SPBLK = [0, 0, 0], SPWHT = [244, 244, 244], SPGOLD = [255, 205, 117], SPGOLD2 = [201, 138, 0], SPGOLD3 = [255, 244, 168];
+
+// apakah piksel teks di koordinat lokal (u,v) menyala? (skala 2x, 3x5 font)
+function spGlyph(s, u, v) {
+  const tw = s.length * 4 - 1;
+  const gx = Math.floor(u / 2 + tw / 2), gy = Math.floor((40 - v) / 2 + 2.5);
+  if (gy < 0 || gy > 4 || gx < 0 || gx >= tw) return 0;
+  const c = gx & 3; if (c === 3) return 0;
+  return SPDIG[s[gx >> 2]][gy][c] === '1' ? 1 : 0;
+}
+
 function spDraw(cv, rot, tm, fast) {
   tm = tm || 0;
-  const c = cv.getContext('2d'), cx = 200, cy = 200, R = 168, n = SP.prizes.length, seg = 360 / n, rad = Math.PI / 180;
-  c.clearRect(0, 0, 400, 400);
+  const c = cv.getContext('2d'); c.imageSmoothingEnabled = false;
+  if (!SP._rgb) SP._rgb = SP.cols.map(h => { const b = spHex(h); return [b, spMix(b, SPWHT, .35), spMix(b, SPBLK, .28)]; });
+  if (!cv._id) cv._id = c.createImageData(SPW, SPW);
+  const img = cv._id, d = img.data, n = SP.prizes.length, seg = 360 / n, rad = Math.PI / 180, cx = 80, cy = 80;
+  const txt = SP.prizes.map(String);
 
-  // --- roda (berputar) ---
-  c.save(); c.translate(cx, cy); c.rotate(rot * rad); c.lineJoin = 'round';
-  const sh = c.createRadialGradient(0, 0, 10, 0, 0, R);
-  sh.addColorStop(0, 'rgba(255,255,255,.38)'); sh.addColorStop(1, 'rgba(255,255,255,0)');
-  for (let i = 0; i < n; i++) {
-    const a0 = (-90 + i * seg - seg / 2) * rad, a1 = a0 + seg * rad;
-    c.beginPath(); c.moveTo(0, 0); c.arc(0, 0, R, a0, a1); c.closePath();
-    c.fillStyle = SP.cols[i % SP.cols.length]; c.fill();
-    c.fillStyle = sh; c.fill();
-    c.lineWidth = 5; c.strokeStyle = '#000'; c.stroke();
-    c.save(); c.rotate(i * seg * rad);
-    c.textAlign = 'center'; c.font = 'bold 34px monospace'; c.lineWidth = 5; c.strokeStyle = '#000';
-    const t = String(SP.prizes[i]);
-    c.strokeText(t, 0, -R + 62); c.fillStyle = '#fff'; c.fillText(t, 0, -R + 62);
-    // koin kecil di tiap kotak hadiah
-    c.beginPath(); c.arc(0, -R + 28, 12, 0, 7);
-    c.fillStyle = '#ffd93b'; c.fill(); c.lineWidth = 3; c.stroke();
-    c.beginPath(); c.arc(-3, -R + 25, 4, 0, 7); c.fillStyle = 'rgba(255,255,255,.8)'; c.fill();
-    c.restore();
+  for (let y = 0; y < SPW; y++) {
+    for (let x = 0; x < SPW; x++) {
+      const dx = x + .5 - cx, dy = y + .5 - cy, r = Math.sqrt(dx * dx + dy * dy), o = (y * SPW + x) * 4;
+      let col = null;
+      if (r > 77) { d[o + 3] = 0; continue; }
+      if (r > 73 || (r > 63 && r <= 65)) col = SPBLK;                  // garis hitam bingkai
+      else if (r > 65) {                                               // bingkai emas (dither)
+        const chk = (x + y) & 1;
+        col = (r > 69 && chk && dx + dy < 0) ? SPGOLD3 : (r > 69 && chk) ? SPGOLD2 : (r <= 69 && chk ? SPGOLD2 : SPGOLD);
+        if (r > 69 && !chk) col = SPGOLD;
+      } else if (r <= 11) {                                            // tutup tengah
+        if (r > 9) col = SPBLK;
+        else if ((Math.abs(dx) < 1.6 && Math.abs(dy) < 5) || (Math.abs(dy) < 1.6 && Math.abs(dx) < 5)) col = [138, 75, 0];
+        else col = (dx + dy < -4) ? SPGOLD3 : SPGOLD;
+      } else {                                                         // segmen hadiah
+        let th = Math.atan2(dx, -dy) / rad - rot;
+        th = ((th % 360) + 360) % 360;
+        const idx = Math.round(th / seg) % n;
+        let del = th - idx * seg; if (del > 180) del -= 360; if (del < -180) del += 360;
+        const ad = Math.abs(del) * rad, dd = seg / 2 * rad - ad;
+        if (r * Math.sin(Math.max(0, dd)) < 1.4) col = SPBLK;          // garis pemisah
+        else {
+          const u = r * Math.sin(del * rad), v = r * Math.cos(del * rad);
+          const cc = SP._rgb[idx % SP._rgb.length], chk = (x + y) & 1;
+          col = r < 24 ? cc[1] : (r < 34 && chk) ? cc[1] : (r >= 59 ? cc[2] : cc[0]);
+          // koin kecil
+          const cu = u, cv2 = v - 55, q = cu * cu + cv2 * cv2;
+          if (q <= 25) col = q > 16 ? SPBLK : ((cu + 1.5) * (cu + 1.5) + (cv2 - 1.5) * (cv2 - 1.5) < 2.5 ? SPGOLD3 : SPGOLD);
+          // angka hadiah (outline hitam + putih)
+          if (v > 30 && v < 51 && Math.abs(u) < 22) {
+            const s = txt[idx];
+            if (spGlyph(s, u, v)) col = SPWHT;
+            else if (spGlyph(s, u - 1, v) || spGlyph(s, u + 1, v) || spGlyph(s, u, v - 1) || spGlyph(s, u, v + 1)) col = SPBLK;
+          }
+        }
+      }
+      d[o] = col[0]; d[o + 1] = col[1]; d[o + 2] = col[2]; d[o + 3] = 255;
+    }
   }
-  c.restore();
+  c.putImageData(img, 0, 0);
 
-  // --- bingkai emas + lampu (diam) ---
-  const g = c.createLinearGradient(0, 0, 400, 400);
-  g.addColorStop(0, '#fff2a8'); g.addColorStop(.5, '#e0a100'); g.addColorStop(1, '#fff2a8');
-  c.beginPath(); c.arc(cx, cy, 182, 0, 7); c.lineWidth = 26; c.strokeStyle = g; c.stroke();
-  c.lineWidth = 4; c.strokeStyle = '#000';
-  c.beginPath(); c.arc(cx, cy, 169, 0, 7); c.stroke();
-  c.beginPath(); c.arc(cx, cy, 195, 0, 7); c.stroke();
+  // --- lampu bingkai (kotak piksel) ---
   const nb = 18;
   for (let i = 0; i < nb; i++) {
-    const a = i * (Math.PI * 2 / nb) - Math.PI / 2, x = cx + Math.cos(a) * 182, y = cy + Math.sin(a) * 182;
+    const a = i * (Math.PI * 2 / nb) - Math.PI / 2, x = Math.round(cx + Math.cos(a) * 69), y = Math.round(cy + Math.sin(a) * 69);
     const lit = fast ? (i + Math.floor(tm / 70)) % 3 === 0 : (i + Math.floor(tm / 350)) % 2 === 0;
-    c.beginPath(); c.arc(x, y, 7, 0, 7);
-    if (lit) { c.shadowColor = '#fff27a'; c.shadowBlur = 14; c.fillStyle = '#fffbd0'; }
-    else { c.shadowBlur = 0; c.fillStyle = '#a8740a'; }
-    c.fill(); c.shadowBlur = 0; c.lineWidth = 2; c.strokeStyle = '#000'; c.stroke();
+    c.fillStyle = '#000'; c.fillRect(x - 3, y - 3, 6, 6);
+    c.fillStyle = lit ? '#f4f4f4' : '#b45f06'; c.fillRect(x - 2, y - 2, 4, 4);
+    if (lit) { c.fillStyle = '#73eff7'; c.fillRect(x - 2, y - 2, 1, 1); }
   }
 
-  // --- tutup tengah ---
-  const hg = c.createRadialGradient(cx - 8, cy - 8, 3, cx, cy, 30);
-  hg.addColorStop(0, '#fffbc4'); hg.addColorStop(.6, '#ffd93b'); hg.addColorStop(1, '#c98a00');
-  c.beginPath(); c.arc(cx, cy, 28, 0, 7); c.fillStyle = hg; c.fill(); c.lineWidth = 5; c.strokeStyle = '#000'; c.stroke();
-  c.textAlign = 'center'; c.textBaseline = 'middle'; c.font = 'bold 26px monospace';
-  c.fillStyle = '#8a4b00'; c.fillText('★', cx, cy + 1); c.textBaseline = 'alphabetic';
-
-  // --- penunjuk ---
-  c.beginPath(); c.moveTo(cx - 22, 0); c.lineTo(cx + 22, 0); c.lineTo(cx, 58); c.closePath();
-  c.fillStyle = '#e63946'; c.fill(); c.lineWidth = 5; c.strokeStyle = '#000'; c.stroke();
-  c.beginPath(); c.moveTo(cx - 12, 6); c.lineTo(cx - 2, 6); c.lineTo(cx - 2, 30); c.closePath();
-  c.fillStyle = 'rgba(255,255,255,.45)'; c.fill();
+  // --- penunjuk (segitiga piksel) ---
+  c.fillStyle = '#000';
+  for (let y = 0; y < 22; y++) { const h = 12 - Math.floor(y * 12 / 22); c.fillRect(cx - h, y, h * 2, 1); }
+  c.fillStyle = '#b13e53';
+  for (let y = 1; y < 18; y++) { const h = 9 - Math.floor((y - 1) * 9 / 17); c.fillRect(cx - h, y, h * 2, 1); }
+  c.fillStyle = '#ef7d57'; c.fillRect(cx - 5, 2, 2, 7);
 }
 
 A.spin = function () {
@@ -212,7 +251,7 @@ A.spin = function () {
   ui(`<div id=spw>
 <div id=spfx>${spFx()}</div>
 <h2>RODA SPIN • ● ${S.coins}</h2>
-<div id=swrap><canvas id=sw width=400 height=400></canvas></div>
+<div id=swrap><canvas id=sw width=160 height=160></canvas></div>
 <p id=sr>${ok ? 'Putar roda dan menangkan koin!' : 'Spin habis! Kalahkan musuh untuk dapat tiket.'}</p>
 <p id=si>${spInfo()}</p>
 <div class=row><button class=g id=sb data-a=dospin ${ok ? '' : 'disabled'}>${spLabel()}</button><button data-a=menu id=sm>Kembali</button></div>
@@ -224,7 +263,7 @@ A.spin = function () {
   let last = 0;
   const idle = t => {
     if (!cv.isConnected) return;
-    if (!SP.busy && t - last > 150) { last = t; spDraw(cv, SP.rot, t, false); }
+    if (!SP.busy && t - last > 350) { last = t; spDraw(cv, SP.rot, t, false); }
     requestAnimationFrame(idle);
   };
   requestAnimationFrame(idle);
