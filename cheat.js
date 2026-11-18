@@ -2,7 +2,7 @@
 
 // ===== MENU CHEAT (pakai password) =====
 // Dimuat SETELAH game.js dan spin.js. Tidak perlu mengedit game.js.
-const CH = { pass: 'gamebintang', ok: false, coins: 999999, speed: 2, msg: '' };
+const CH = { pass: 'gamebintang', ok: false, coins: 999999, tix: 999, speed: 2, msg: '' };
 
 (() => {
   const st = document.createElement('style');
@@ -35,11 +35,22 @@ move = function (o, dt) {
   else chMove(o, dt);
 };
 
-// --- hilangkan musuh / boss (dicek tiap frame) ---
+// --- update: hilangkan musuh/boss + lompat ganda ---
 const chUpdate = update;
 update = function (dt) {
   if (S.chNoBoss && boss && !boss.dead) { boss.dead = 1; boss.dt = 0; }
   if (S.chNoEn || S.chNoBoss) en = en.filter(e => e.big ? !S.chNoBoss : !S.chNoEn);
+
+  // Lompat ganda: tekan lompat lagi saat di udara (setelah coyote time habis)
+  if (S.chDJ && P) {
+    if (P.on) P.dj = 1;
+    else if (K.j && !pj && P.cy <= 0 && (P.dj | 0) > 0) {
+      P.dj--;
+      P.vy = -650; P.jp = 1; P.jb = 0;
+      sfx(620, .12);
+    }
+    pj = K.j;   // cegah buffer lompat memicu lompatan ekstra saat mendarat
+  }
   chUpdate(dt);
 };
 
@@ -50,6 +61,13 @@ A.buy = function (id) {
   chBuy(id);
   if (S.chCoin) { S.coins = CH.coins; save(); A.shop(); }
 };
+
+// --- tiket tak terbatas: dijaga terus selama aktif (S.tix) ---
+setInterval(() => {
+  if (!S.chTix) return;
+  if (S.tix !== CH.tix) { S.tix = CH.tix; save(); }
+  S.spinUsed = 0;   // batas spin harian ikut di-reset
+}, 100);
 
 const chOnOff = k => S[k] ? 'ON' : 'OFF', chCls = k => S[k] ? 'g' : 'r';
 
@@ -64,7 +82,9 @@ A.cheat = function () {
   ui(`<h2>🦠 CHEAT</h2>
 <div class="row ch">
 <button class=${chCls('chCoin')} data-a=chcoin>Koin Tak Terbatas: ${chOnOff('chCoin')}</button>
+<button class=${chCls('chTix')} data-a=chtix>Tiket Tak Terbatas: ${chOnOff('chTix')}</button>
 <button class=${chCls('chInv')} data-a=chtog data-n=chInv>Kebal Musuh: ${chOnOff('chInv')}</button>
+<button class=${chCls('chDJ')} data-a=chtog data-n=chDJ>Lompat Ganda: ${chOnOff('chDJ')}</button>
 <button class=${chCls('chSpd')} data-a=chtog data-n=chSpd>Jalan Cepat: ${chOnOff('chSpd')}</button>
 <button class=${chCls('chNoEn')} data-a=chtog data-n=chNoEn>Hilangkan Musuh: ${chOnOff('chNoEn')}</button>
 <button class=${chCls('chNoBoss')} data-a=chtog data-n=chNoBoss>Hilangkan Boss: ${chOnOff('chNoBoss')}</button>
@@ -82,8 +102,15 @@ A.chcoin = function () {
   save(); A.cheat();
 };
 
+A.chtix = function () {
+  if (!CH.ok) return;
+  if (S.chTix) { S.chTix = false; S.tix = S.chTb | 0; }       // dimatikan: tiket kembali seperti semula
+  else { S.chTix = true; S.chTb = S.tix | 0; S.tix = CH.tix; }
+  sfx(S.chTix ? 800 : 400, .08); save(); A.cheat();
+};
+
 A.chtog = function (k) {
-  if (!CH.ok || !['chInv', 'chSpd', 'chNoEn', 'chNoBoss'].includes(k)) return;
+  if (!CH.ok || !['chInv', 'chSpd', 'chNoEn', 'chNoBoss', 'chDJ'].includes(k)) return;
   S[k] = !S[k]; sfx(S[k] ? 800 : 400, .08); save(); A.cheat();
 };
 
