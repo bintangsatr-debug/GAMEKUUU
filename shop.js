@@ -270,33 +270,41 @@ function charImg(){try{
   chr(c,S.skin,S.acc,0);
   return cv.toDataURL()}catch(e){return''}}
 
+// Skala toko mengikuti ukuran canvas game (800 x 450).
+// Semua ukuran di CSS di bawah ditulis dalam "unit game": z(14) = 14 unit.
+// Jadi toko otomatis mengecil/membesar bersama layar game dan tidak keluar batas.
+const shopU=()=>Math.max(.2,(C.getBoundingClientRect().width||W)/W);
+
 // CSS khusus toko (ubah ukuran/warna di sini)
 function shopStyle(){
   if(document.getElementById('shop-css'))return;
+  const z=n=>`calc(var(--u,.5px)*${n})`;
   const s=document.createElement('style');s.id='shop-css';
   s.textContent=`
-#ui .sh-top{display:flex;align-items:center;justify-content:space-between;gap:10px;width:min(94vw,720px);margin:0 0 6px}
-#ui .sh-top h2{margin:0;font-size:22px}
-#ui .sh-top button{margin:0;padding:6px 14px;font-size:14px}
-#ui .sh-coin{color:#ffd93b;font-weight:bold;font-size:16px}
-#ui .sh-wrap{display:flex;gap:12px;width:min(94vw,720px);align-items:stretch}
-#ui .sh-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
-#ui .sh-tabs{display:flex;gap:4px}
-#ui .sh-tab{flex:1;margin:0;padding:6px 2px;font-size:13px;opacity:.6}
-#ui .sh-tab.on{opacity:1;outline:2px solid #ffd93b}
-#ui .sh-list{display:flex;flex-direction:column;gap:6px;max-height:250px;overflow-y:auto;padding-right:4px}
-#ui .sh-it{display:flex;align-items:center;gap:8px;margin:0;padding:4px 8px;text-align:left;width:100%}
-#ui .sh-it img{width:40px;height:40px;image-rendering:pixelated;flex:none}
-#ui .sh-it .sh-n{flex:1;font-weight:bold;font-size:14px}
-#ui .sh-it .sh-s{font-size:13px;white-space:nowrap}
-#ui .sh-it.on{outline:2px solid #2ecc40}
-#ui .sh-empty{padding:40px 10px;text-align:center;opacity:.7;font-size:14px}
-#ui .sh-right{width:190px;flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:rgba(0,0,0,.35);border-radius:10px;padding:10px;text-align:center}
-#ui .sh-char{width:156px;height:192px;image-rendering:pixelated}
-#ui .sh-right b{font-size:15px}
-#ui .sh-right small{font-size:12px;opacity:.85;line-height:1.4}
+#ui .sh-root{position:absolute;left:0;top:0;width:100%;height:100%;box-sizing:border-box;padding:${z(8)};display:flex;flex-direction:column;gap:${z(6)};text-align:left}
+#ui .sh-top{display:flex;align-items:center;gap:${z(10)};flex:none;height:${z(30)}}
+#ui .sh-top h2{margin:0;padding:0;flex:1;font-size:${z(24)};line-height:1}
+#ui .sh-coin{color:#ffd93b;font-weight:bold;font-size:${z(17)}}
+#ui .sh-top button{margin:0;padding:0 ${z(14)};height:${z(30)};min-height:0;width:auto;font-size:${z(15)};line-height:1;letter-spacing:0}
+#ui .sh-wrap{flex:1;min-height:0;display:flex;gap:${z(10)}}
+#ui .sh-left{flex:1;min-width:0;display:flex;flex-direction:column;gap:${z(6)}}
+#ui .sh-tabs{display:flex;gap:${z(4)};flex:none}
+#ui .sh-tab{flex:1;min-width:0;margin:0;padding:0;height:${z(30)};min-height:0;width:auto;font-size:${z(15)};line-height:1;letter-spacing:0;opacity:.6}
+#ui .sh-tab.on{opacity:1;outline:${z(2)} solid #ffd93b}
+#ui .sh-list{flex:1;min-height:0;display:flex;flex-direction:column;gap:${z(6)};overflow-y:auto;padding-right:${z(4)}}
+#ui .sh-it{flex:none;display:flex;align-items:center;gap:${z(8)};margin:0;padding:${z(4)} ${z(8)};width:100%;height:${z(52)};min-height:0;box-sizing:border-box;text-align:left;letter-spacing:0;overflow:hidden}
+#ui .sh-it img{width:${z(40)};height:${z(40)};image-rendering:pixelated;flex:none}
+#ui .sh-it .sh-n{flex:1;min-width:0;font-size:${z(16)};font-weight:bold;line-height:1.1}
+#ui .sh-it .sh-s{flex:none;font-size:${z(13)};white-space:nowrap}
+#ui .sh-it.on{outline:${z(2)} solid #2ecc40}
+#ui .sh-empty{padding:${z(40)} ${z(10)};text-align:center;opacity:.7;font-size:${z(15)}}
+#ui .sh-right{width:${z(190)};flex:none;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:${z(4)};background:rgba(0,0,0,.35);border-radius:${z(10)};padding:${z(8)};text-align:center}
+#ui .sh-char{width:${z(156)};height:${z(192)};image-rendering:pixelated;object-fit:contain}
+#ui .sh-right b{font-size:${z(16)}}
+#ui .sh-right small{font-size:${z(12)};line-height:1.4;opacity:.85}
 `;
   document.head.appendChild(s);
+  addEventListener('resize',()=>{const r=document.querySelector('.sh-root');if(r)r.style.setProperty('--u',shopU()+'px')});
 }
 
 // Kartu item di daftar kiri
@@ -317,12 +325,13 @@ const SHOP={
     const list=items.length?items.map(shopCard).join(''):'<div class=sh-empty>Belum ada item.<br>Segera hadir!</div>';
     const me=IT.find(x=>x.id==S.skin),wp=IT.find(x=>x.id==S.weapon);
     const accOn=IT.filter(x=>x.cat=='Aksesoris'&&S.acc.includes(x.id)).map(x=>x.n);
-    ui(`<div class=sh-top><h2>TOKO</h2><span class=sh-coin>● ${S.coins}</span><button data-a=menu>Kembali</button></div>
+    ui(`<div class=sh-root style="--u:${shopU()}px">
+<div class=sh-top><h2>TOKO</h2><span class=sh-coin>● ${S.coins}</span><button data-a=menu>Kembali</button></div>
 <div class=sh-wrap>
 <div class=sh-left><div class=sh-tabs>${tabs}</div><div class=sh-list>${list}</div></div>
 <div class=sh-right><img class=sh-char src="${charImg()}"><b>${me?me.n:''}</b>
 <small>Aksesoris: ${accOn.length?accOn.join(', '):'-'}<br>Senjata: ${wp?wp.n:'-'}</small></div>
-</div>`);
+</div></div>`);
   },
   buy(id){
     // pindah tab (dipakai tombol tab lewat data-n="tab:NamaKategori")
