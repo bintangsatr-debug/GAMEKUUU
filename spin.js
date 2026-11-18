@@ -19,6 +19,10 @@ const SP = {
   st.textContent = `
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* tombol "Spin" di menu utama jadi ungu */
+button[data-a=spin]{background:#8e44ad!important;background-color:#8e44ad!important}
+button[data-a=spin]:hover{background:#a55cc7!important}
+
 /* panel #ui transparan, kotak retro dibuat oleh #spw sendiri */
 #ui:has(#spw){background:none!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important;outline:none!important}
 
