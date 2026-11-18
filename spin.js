@@ -22,49 +22,49 @@ const SP = {
 /* panel #ui transparan, kotak retro dibuat oleh #spw sendiri */
 #ui:has(#spw){background:none!important;border:none!important;box-shadow:none!important;backdrop-filter:none!important;outline:none!important}
 
-#spw{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:1.3cqw;
-  padding:2cqw 4cqw 2.4cqw;
+#spw{position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;gap:1.17cqw;
+  padding:1.8cqw 3.6cqw 2.16cqw;
   font-family:'Press Start 2P',ui-monospace,Menlo,Consolas,monospace;image-rendering:pixelated;
   background:
-    repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 .4cqw,transparent .4cqw .8cqw),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.03) 0 .36cqw,transparent .36cqw .72cqw),
     radial-gradient(ellipse at 50% 45%,#29366f 0%,#1a1c2c 78%);
   /* bingkai piksel berlapis: hitam - emas - hitam */
-  box-shadow:0 0 0 .6cqw #000,0 0 0 1.2cqw #ffcd75,0 0 0 1.8cqw #000,0 1.2cqw 0 1.8cqw #000}
+  box-shadow:0 0 0 .54cqw #000,0 0 0 1.08cqw #ffcd75,0 0 0 1.62cqw #000,0 1.08cqw 0 1.62cqw #000}
 #spw>*:not(#spfx){position:relative;z-index:1}
 /* garis scanline layar CRT */
 #spw::after{content:'';position:absolute;inset:0;z-index:5;pointer-events:none;
-  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 .15cqw,transparent .15cqw .45cqw)}
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 .135cqw,transparent .135cqw .405cqw)}
 
 /* judul */
-#spw h2{margin:0;font:inherit;font-size:2.4cqw;line-height:1.4;color:#ffcd75;letter-spacing:.1cqw;
-  text-shadow:.3cqw .3cqw 0 #b13e53,.6cqw .6cqw 0 #000}
+#spw h2{margin:0;font:inherit;font-size:2.16cqw;line-height:1.4;color:#ffcd75;letter-spacing:.09cqw;
+  text-shadow:.27cqw .27cqw 0 #b13e53,.54cqw .54cqw 0 #000}
 #spw h2.pop{animation:sppop .4s steps(4)}
 
 /* roda */
-#swrap{position:relative;width:29cqw;height:29cqw}
+#swrap{position:relative;width:26.1cqw;height:26.1cqw}
 #swrap.win{animation:spflash .8s steps(6)}
 #sw{width:100%;height:100%;display:block;background:transparent!important;background-color:transparent!important;
   border:none!important;box-shadow:none!important;outline:none!important;
   image-rendering:pixelated;image-rendering:crisp-edges;image-rendering:pixelated}
 
 /* teks hasil & info */
-#sr{margin:0;min-height:2.6cqw;font-size:1.7cqw;line-height:1.5;text-align:center;color:#a7f070;
-  text-transform:uppercase;text-shadow:.25cqw .25cqw 0 #000}
+#sr{margin:0;min-height:2.34cqw;font-size:1.53cqw;line-height:1.5;text-align:center;color:#a7f070;
+  text-transform:uppercase;text-shadow:.225cqw .225cqw 0 #000}
 #sr.pop{animation:sppop .5s steps(5);color:#ffcd75}
-#si{margin:0;max-width:62cqw;text-align:center;font-size:.95cqw;line-height:1.8;color:#73eff7;
-  text-transform:uppercase;padding:.8cqw 1.6cqw;background:#333c57;
-  box-shadow:0 -.3cqw 0 0 #000,0 .3cqw 0 0 #000,-.3cqw 0 0 0 #000,.3cqw 0 0 0 #000,
-    inset -.3cqw -.3cqw 0 0 #1a1c2c,inset .3cqw .3cqw 0 0 #566c86}
+#si{margin:0;max-width:55.8cqw;text-align:center;font-size:.855cqw;line-height:1.8;color:#73eff7;
+  text-transform:uppercase;padding:.72cqw 1.44cqw;background:#333c57;
+  box-shadow:0 -.27cqw 0 0 #000,0 .27cqw 0 0 #000,-.27cqw 0 0 0 #000,.27cqw 0 0 0 #000,
+    inset -.27cqw -.27cqw 0 0 #1a1c2c,inset .27cqw .27cqw 0 0 #566c86}
 
 /* tombol kotak retro */
-#spw .row{display:flex;gap:2.4cqw;justify-content:center;margin-top:.8cqw}
-#spw button{font:inherit;font-size:1.7cqw;color:#fff;text-transform:uppercase;
-  padding:1.3cqw 2.8cqw;border:.4cqw solid #000;border-radius:0;cursor:pointer;
-  box-shadow:.6cqw .6cqw 0 0 #000;transition:none}
-#spw button#sb{background:#38b764;font-size:2cqw;padding:1.4cqw 3.6cqw}
+#spw .row{display:flex;gap:2.16cqw;justify-content:center;margin-top:.72cqw}
+#spw button{font:inherit;font-size:1.53cqw;color:#fff;text-transform:uppercase;
+  padding:1.17cqw 2.52cqw;border:.36cqw solid #000;border-radius:0;cursor:pointer;
+  box-shadow:.54cqw .54cqw 0 0 #000;transition:none}
+#spw button#sb{background:#38b764;font-size:1.8cqw;padding:1.26cqw 3.24cqw}
 #spw button#sm{background:#3b5dc9}
 #spw button:hover:not(:disabled){background-color:#ffcd75;color:#000}
-#spw button:active:not(:disabled){transform:translate(.6cqw,.6cqw);box-shadow:none}
+#spw button:active:not(:disabled){transform:translate(.54cqw,.54cqw);box-shadow:none}
 #spw button:disabled{background:#566c86;color:#94b0c2;cursor:not-allowed}
 
 /* koin piksel melayang & kilau */
@@ -72,16 +72,16 @@ const SP = {
 .fc{position:absolute;top:105%;aspect-ratio:1;animation:spfloat linear infinite;animation-timing-function:steps(36)}
 .fc b{display:block;width:100%;height:100%;background:#ffcd75;
   clip-path:polygon(25% 0,75% 0,75% 12%,88% 12%,88% 25%,100% 25%,100% 75%,88% 75%,88% 88%,75% 88%,75% 100%,25% 100%,25% 88%,12% 88%,12% 75%,0 75%,0 25%,12% 25%,12% 12%,25% 12%);
-  box-shadow:inset -.4cqw -.4cqw 0 0 #c98a00,inset .35cqw .35cqw 0 0 #fff4a8;
+  box-shadow:inset -.36cqw -.36cqw 0 0 #c98a00,inset .315cqw .315cqw 0 0 #fff4a8;
   animation:spflip 1.2s steps(1) infinite}
-.ks{position:absolute;font-size:1cqw;width:.3em;height:.3em;background:currentColor;opacity:0;
+.ks{position:absolute;font-size:.9cqw;width:.3em;height:.3em;background:currentColor;opacity:0;
   box-shadow:0 -.3em 0 currentColor,0 .3em 0 currentColor,-.3em 0 0 currentColor,.3em 0 0 currentColor;
   animation:sptwinkle steps(1) infinite}
-.bc{position:absolute;left:50%;top:50%;width:2.4cqw;height:2.4cqw;z-index:3;pointer-events:none;background:#ffcd75;
+.bc{position:absolute;left:50%;top:50%;width:2.16cqw;height:2.16cqw;z-index:3;pointer-events:none;background:#ffcd75;
   clip-path:polygon(25% 0,75% 0,75% 12%,88% 12%,88% 25%,100% 25%,100% 75%,88% 75%,88% 88%,75% 88%,75% 100%,25% 100%,25% 88%,12% 88%,12% 75%,0 75%,0 25%,12% 25%,12% 12%,25% 12%);
-  box-shadow:inset -.35cqw -.35cqw 0 0 #c98a00,inset .3cqw .3cqw 0 0 #fff4a8;
+  box-shadow:inset -.315cqw -.315cqw 0 0 #c98a00,inset .27cqw .27cqw 0 0 #fff4a8;
   animation:spburst 1.2s steps(10) forwards}
-.bs{position:absolute;left:50%;top:50%;z-index:3;pointer-events:none;width:1cqw;height:1cqw;background:currentColor;
+.bs{position:absolute;left:50%;top:50%;z-index:3;pointer-events:none;width:.9cqw;height:.9cqw;background:currentColor;
   animation:spburst 1.2s steps(10) forwards}
 
 @keyframes spfloat{0%{top:105%;opacity:0}8%{opacity:1}88%{opacity:1}100%{top:-12%;opacity:0}}
@@ -93,7 +93,7 @@ const SP = {
 @keyframes spburst{
   0%{transform:translate(-50%,-50%) scale(.4);opacity:1}
   55%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1);opacity:1}
-  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 12cqw)) scale(.8);opacity:0}}
+  100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 10.8cqw)) scale(.8);opacity:0}}
 @media (prefers-reduced-motion:reduce){.fc,.ks{animation:none}}
 `;
   document.head.appendChild(st);
@@ -117,14 +117,14 @@ function spPick() {
 function spFx() {
   let h = '';
   for (let i = 0; i < 10; i++) {
-    const sz = 2.2 + Math.random() * 2, dur = 7 + Math.random() * 6;
+    const sz = (2.2 + Math.random() * 2) * .9, dur = 7 + Math.random() * 6;
     h += `<i class=fc style="left:${(4 + Math.random() * 90).toFixed(1)}%;width:${sz.toFixed(1)}cqw;` +
          `animation-duration:${dur.toFixed(1)}s;animation-delay:-${(Math.random() * dur).toFixed(1)}s"><b style="animation-delay:-${(Math.random() * 3).toFixed(1)}s"></b></i>`;
   }
   const cs = ['#f4f4f4', '#ffcd75', '#73eff7', '#ef7d57'];
   for (let i = 0; i < 16; i++) {
     h += `<i class=ks style="left:${(2 + Math.random() * 94).toFixed(1)}%;top:${(4 + Math.random() * 88).toFixed(1)}%;` +
-         `font-size:${(1 + Math.random() * 1.2).toFixed(1)}cqw;color:${cs[i % cs.length]};` +
+         `font-size:${((1 + Math.random() * 1.2) * .9).toFixed(2)}cqw;color:${cs[i % cs.length]};` +
          `animation-duration:${(1.6 + Math.random() * 1.8).toFixed(1)}s;animation-delay:-${(Math.random() * 3).toFixed(1)}s"></i>`;
   }
   return h;
@@ -135,12 +135,12 @@ function spBurst(amt) {
   const w = document.getElementById('swrap'); if (!w) return;
   const n = amt >= 200 ? 26 : 14, cs = ['#f4f4f4', '#ffcd75', '#73eff7', '#ef7d57'];
   for (let i = 0; i < n; i++) {
-    const a = Math.random() * Math.PI * 2, d = 8 + Math.random() * 14;
+    const a = Math.random() * Math.PI * 2, d = (8 + Math.random() * 14) * .9;
     const el = document.createElement('i');
     el.className = i % 3 === 0 ? 'bs' : 'bc';
     if (i % 3 === 0) el.style.color = cs[i % cs.length];
     el.style.setProperty('--dx', (Math.cos(a) * d).toFixed(1) + 'cqw');
-    el.style.setProperty('--dy', (Math.sin(a) * d - 4).toFixed(1) + 'cqw');
+    el.style.setProperty('--dy', (Math.sin(a) * d - 3.6).toFixed(1) + 'cqw');
     el.style.animationDelay = (Math.random() * .12).toFixed(2) + 's';
     w.appendChild(el);
     setTimeout(() => el.remove(), 1500);
