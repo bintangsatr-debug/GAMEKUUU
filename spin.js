@@ -56,21 +56,16 @@ const SP = {
   box-shadow:0 -.3cqw 0 0 #000,0 .3cqw 0 0 #000,-.3cqw 0 0 0 #000,.3cqw 0 0 0 #000,
     inset -.3cqw -.3cqw 0 0 #1a1c2c,inset .3cqw .3cqw 0 0 #566c86}
 
-/* tombol piksel */
-#spw .row{display:flex;gap:2cqw;justify-content:center;margin-top:.8cqw}
-#spw button{position:relative;font:inherit;font-size:1.7cqw;color:#fff;text-transform:uppercase;
-  padding:1.3cqw 2.8cqw;border:none;border-radius:0;cursor:pointer;
-  text-shadow:.2cqw .2cqw 0 rgba(0,0,0,.7);
-  box-shadow:inset -.5cqw -.5cqw 0 0 rgba(0,0,0,.35),inset .5cqw .5cqw 0 0 rgba(255,255,255,.45),
-    -.4cqw 0 0 0 #000,.4cqw 0 0 0 #000,0 -.4cqw 0 0 #000,0 .9cqw 0 0 #000;
-  transition:none}
-#spw button#sb{background:#38b764;font-size:2cqw;padding:1.4cqw 3.6cqw;animation:spbeat 1s steps(1) infinite}
+/* tombol kotak retro */
+#spw .row{display:flex;gap:2.4cqw;justify-content:center;margin-top:.8cqw}
+#spw button{font:inherit;font-size:1.7cqw;color:#fff;text-transform:uppercase;
+  padding:1.3cqw 2.8cqw;border:.4cqw solid #000;border-radius:0;cursor:pointer;
+  box-shadow:.6cqw .6cqw 0 0 #000;transition:none}
+#spw button#sb{background:#38b764;font-size:2cqw;padding:1.4cqw 3.6cqw}
 #spw button#sm{background:#3b5dc9}
-#spw button:hover:not(:disabled){filter:brightness(1.2)}
-#spw button:active:not(:disabled){transform:translateY(.5cqw);
-  box-shadow:inset -.5cqw -.5cqw 0 0 rgba(0,0,0,.35),inset .5cqw .5cqw 0 0 rgba(255,255,255,.45),
-    -.4cqw 0 0 0 #000,.4cqw 0 0 0 #000,0 -.4cqw 0 0 #000,0 .4cqw 0 0 #000}
-#spw button:disabled{background:#566c86;color:#94b0c2;cursor:not-allowed;animation:none;text-shadow:none}
+#spw button:hover:not(:disabled){background-color:#ffcd75;color:#000}
+#spw button:active:not(:disabled){transform:translate(.6cqw,.6cqw);box-shadow:none}
+#spw button:disabled{background:#566c86;color:#94b0c2;cursor:not-allowed}
 
 /* koin piksel melayang & kilau */
 #spfx{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -99,7 +94,7 @@ const SP = {
   0%{transform:translate(-50%,-50%) scale(.4);opacity:1}
   55%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1);opacity:1}
   100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy) + 12cqw)) scale(.8);opacity:0}}
-@media (prefers-reduced-motion:reduce){.fc,.ks,#spw button#sb{animation:none}}
+@media (prefers-reduced-motion:reduce){.fc,.ks{animation:none}}
 `;
   document.head.appendChild(st);
 })();
