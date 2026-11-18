@@ -47,9 +47,9 @@ update = function (dt) {
     else if (K.j && !pj && P.cy <= 0 && (P.dj | 0) > 0) {
       P.dj--;
       P.vy = -650; P.jp = 1; P.jb = 0;
+      pj = K.j;   // tandai tombol sudah dipakai, cegah buffer lompat memicu lompatan ekstra
       sfx(620, .12);
     }
-    pj = K.j;   // cegah buffer lompat memicu lompatan ekstra saat mendarat
   }
   chUpdate(dt);
 };
